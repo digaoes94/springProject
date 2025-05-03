@@ -13,6 +13,8 @@ import com.educandoweb.springProject.repositories.UserRepository;
 import com.educandoweb.springProject.services.exceptions.DatabaseException;
 import com.educandoweb.springProject.services.exceptions.ResourceNotFoundException;
 
+import jakarta.persistence.EntityNotFoundException;
+
 @Service
 public class UserService {
 	@Autowired
@@ -44,9 +46,14 @@ public class UserService {
 	}
 	
 	public User update(Long id, User obj) {
-		User entity = userRepo.getReferenceById(id);
-		updateData(entity, obj);
-		return userRepo.save(entity);
+		try {
+			User entity = userRepo.getReferenceById(id);
+			updateData(entity, obj);
+			return userRepo.save(entity);
+		}
+		catch(EntityNotFoundException e) {
+			throw new ResourceNotFoundException(id);
+		}
 	}
 
 	private void updateData(User entity, User obj) {
